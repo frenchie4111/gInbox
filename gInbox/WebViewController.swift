@@ -19,6 +19,13 @@ class WebViewController: NSViewController, WKNavigationDelegate {
     // constants
     let webUrl = "https://inbox.google.com"
     
+    let allowedPrefixes = [
+        "http://inbox.google.com",
+        "http://accounts.google.com",
+        "https://inbox.google.com",
+        "https://accounts.google.com"
+    ]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -62,12 +69,28 @@ class WebViewController: NSViewController, WKNavigationDelegate {
         }
     }
     
+    func shouldOpenUrlInWebview( url: String ) -> Bool {
+        for allowedPrefix in allowedPrefixes {
+            if( url.hasPrefix( allowedPrefix ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    func openOutside( url: String ) {
+        NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
+    }
+
     override func webView(webView: WebView!, decidePolicyForNewWindowAction actionInformation: [NSObject : AnyObject]!, request: NSURLRequest!, newFrameName frameName: String!, decisionListener listener: WebPolicyDecisionListener!) {
-        if (request.URL!.absoluteString!.hasPrefix("https://accounts.google.com") == false) {
-            NSWorkspace.sharedWorkspace().openURL(NSURL(string: (actionInformation["WebActionOriginalURLKey"]?.absoluteString)!)!)
-            listener.ignore()
+        let url = request.URL!.absoluteString!;
+        
+        if( shouldOpenUrlInWebview( url ) ) {
+            webView.mainFrame.loadRequest( request );
         } else {
-            webView.mainFrame.loadRequest(request)
+            openOutside( url );
+            listener.ignore()
         }
     }
     
