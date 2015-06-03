@@ -69,9 +69,9 @@ class WebViewController: NSViewController, WKNavigationDelegate {
         }
     }
     
-    func shouldOpenUrlInWebview( url: String ) -> Bool {
+    func shouldOpenUrlInWebview(url: String) -> Bool {
         for allowedPrefix in allowedPrefixes {
-            if( url.hasPrefix( allowedPrefix ) ) {
+            if(url.hasPrefix(allowedPrefix)) {
                 return true;
             }
         }
@@ -79,17 +79,17 @@ class WebViewController: NSViewController, WKNavigationDelegate {
         return false;
     }
     
-    func openOutside( url: String ) {
+    func openOutside(url: String) {
         NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
     }
 
     override func webView(webView: WebView!, decidePolicyForNewWindowAction actionInformation: [NSObject : AnyObject]!, request: NSURLRequest!, newFrameName frameName: String!, decisionListener listener: WebPolicyDecisionListener!) {
         let url = request.URL!.absoluteString!;
         
-        if( shouldOpenUrlInWebview( url ) ) {
-            webView.mainFrame.loadRequest( request );
+        if(shouldOpenUrlInWebview(url)) {
+            webView.mainFrame.loadRequest(request);
         } else {
-            openOutside( url );
+            openOutside(url);
             listener.ignore()
         }
     }
